@@ -72,10 +72,7 @@ export default function Sidebar({ onLogout }) {
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <FileText size={20} /> {/* Placeholder icon for Templates */}
-                    <span>Resume Templates</span>
-                  </div>
+                  Resume Templates
                 </Link>
                 <Link
                   to="/my-resumes"
@@ -85,10 +82,7 @@ export default function Sidebar({ onLogout }) {
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <FileText size={20} />
-                    <span>My Resumes</span>
-                  </div>
+                  My Resumes
                 </Link>
               </div>
             )}

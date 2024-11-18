@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useState } from 'react';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export default function Login({ setUser }) {
   const navigate = useNavigate();
@@ -12,39 +12,33 @@ export default function Login({ setUser }) {
   const [password, setPassword] = useState('');
 
   const login = useGoogleLogin({
-    scope: 'openid email profile', // Ensure openid scope is included
     onSuccess: async (tokenResponse) => {
-      console.log('Token Response:', tokenResponse); // Log to verify access_token
-      if (!tokenResponse.access_token) {
-        setError('Failed to retrieve access token from Google.');
-        return;
-      }
       try {
+        console.log('Google login successful. Token:', tokenResponse);
         const res = await axios.post(
           `${API_URL}/api/auth/google`,
-          { token: tokenResponse.access_token }, // Send access_token
+          { token: tokenResponse.access_token },
           {
             headers: {
               'Content-Type': 'application/json',
             },
           }
         );
-        const userData = res.data.user;
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        console.log('Server response:', res.data);
+        const { token, user } = res.data;
+        localStorage.setItem('token', token);
+        setUser(user);
         navigate('/templates');
       } catch (err) {
-        console.error(
-          'Authentication error:',
-          err.response ? err.response.data : err.message
-        );
-        setError('Failed to authenticate. Please try again.');
+        console.error('Authentication error:', err.response ? err.response.data : err.message);
+        setError('Failed to authenticate. Please try again. ' + (err.response?.data?.msg || err.message));
       }
     },
     onError: (error) => {
       console.error('Google Sign-In error:', error);
-      setError('Google Sign-In failed. Please try again.');
+      setError('Google Sign-In failed. Please try again. ' + error.message);
     },
+    flow: 'implicit',
   });
 
   const handleSubmit = async (e) => {
@@ -53,13 +47,13 @@ export default function Login({ setUser }) {
       const res = await axios.post(`${API_URL}/api/auth/login`, { email, password }, {
         headers: { 'Content-Type': 'application/json' }
       });
-      const userData = res.data.user;
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
+      const { token, user } = res.data;
+      localStorage.setItem('token', token);
+      setUser(user);
       navigate('/templates');
     } catch (err) {
       console.error('Login error:', err.response ? err.response.data : err.message);
-      setError('Login failed. Please check your credentials and try again.');
+      setError('Login failed. Please check your credentials and try again. ' + (err.response?.data?.msg || err.message));
     }
   };
 
