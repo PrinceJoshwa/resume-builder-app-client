@@ -128,34 +128,30 @@
 //   );
 // 
 
-import { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 
 const Login = ({ setUser }) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/templates');
-    }
-  }, [navigate]);
-
-  const onSuccess = async (response) => {
-    try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/google`, {
-        token: response.access_token,
-      });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      setUser(res.data.user);
-      navigate('/templates');
-    } catch (error) {
-      console.error('Authentication error:', error);
-    }
-  };
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/google`, {
+          token: tokenResponse.access_token,
+        });
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        setUser(res.data.user);
+        navigate('/templates');
+      } catch (error) {
+        console.error('Authentication error:', error);
+      }
+    },
+    onError: (error) => console.error('Login Failed:', error)
+  });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -167,13 +163,12 @@ const Login = ({ setUser }) => {
         </div>
         <div className="mt-8 space-y-6">
           <div>
-            <GoogleLogin
-              clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-              buttonText="Sign in with Google"
-              onSuccess={onSuccess}
-              onFailure={(error) => console.error('Google Sign-In Error:', error)}
-              cookiePolicy={'single_host_origin'}
-            />
+            <button
+              onClick={() => login()}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Sign in with Google
+            </button>
           </div>
         </div>
       </div>
