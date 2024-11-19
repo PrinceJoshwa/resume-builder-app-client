@@ -58,34 +58,34 @@
 
 // export default App
 
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from './components/Login';
-import Templates from './pages/Templates';
-import Template1 from './pages/Template1';
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import Login from './components/Login'
+import Templates from './pages/Templates'
+import Template1 from './pages/Template1'
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem('user')
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(JSON.parse(storedUser))
     }
-  }, []);
+  }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    setUser(null);
-  };
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
+    setUser(null)
+  }
 
   const ProtectedRoute = ({ children }) => {
     if (!user) {
-      return <Navigate to="/login" replace />;
+      return <Navigate to="/login" replace />
     }
-    return children;
-  };
+    return children
+  }
 
   return (
     <Routes>
@@ -113,7 +113,7 @@ function App() {
 
       <Route path="*" element={<div>Page Not Found</div>} />
     </Routes>
-  );
+  )
 }
 
-export default App;
+export default App
