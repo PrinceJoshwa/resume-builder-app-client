@@ -22,9 +22,11 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import App from './App.jsx';
 import './index.css';
 
-const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const clientId = import.meta.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-console.log("Google Client ID:", clientId); // Debugging step
+if (!clientId) {
+  throw new Error('Google Client ID is not defined');
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
