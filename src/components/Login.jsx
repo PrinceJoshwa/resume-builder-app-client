@@ -227,7 +227,6 @@
 // }
 
 
-
 import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -241,14 +240,19 @@ export default function Login({ setUser }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Debugging: Log the environment variable
+  console.log('API URL:', API_URL);
+  console.log('Google Client ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID);
+
   // Google Login
   const loginWithGoogle = useGoogleLogin({
+    clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID, // Explicitly pass clientId
     onSuccess: async (tokenResponse) => {
+      console.log('Google Token Response:', tokenResponse); // Debugging
       try {
-        console.log('Google Token Response:', tokenResponse); // Debugging
         const res = await axios.post(
           `${API_URL}/api/auth/google`,
-          { token: tokenResponse.access_token }, // Using the access token from Google response
+          { token: tokenResponse.access_token }, // Using access token from Google
           {
             headers: { 'Content-Type': 'application/json' },
             withCredentials: true,
@@ -267,7 +271,7 @@ export default function Login({ setUser }) {
       console.error('Google Sign-In error:', err.message);
       setError('Google Sign-In failed. Please try again.');
     },
-    flow: 'implicit', // Ensure the flow matches your Google Cloud Console setup
+    flow: 'implicit', // Match the flow configured in Google Cloud Console
   });
 
   // Email and Password Login
